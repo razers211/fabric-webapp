@@ -199,7 +199,7 @@ const SpineLeafDeployment: React.FC = () => {
       setValidationResults({ 
         valid: false, 
         connectivity: [],
-        errors: ['Validation failed: ' + error.message]
+        errors: ['Validation failed: ' + (error instanceof Error ? error.message : String(error))]
       });
     }
   };
