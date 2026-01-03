@@ -141,32 +141,29 @@ const SpineLeafDeployment: React.FC = () => {
         spineSwitches,
         leafSwitches,
         vlans,
-        underlayProtocol: 'ospf' // Default or get from form state
+        underlayProtocol: 'ospf'
       };
 
-      // Show loading state
       console.log('Validating configuration...', config);
 
-      // For now, simulate validation (since API might not be implemented yet)
-      const validation = {
-        valid: spineSwitches.length > 0 && leafSwitches.length > 0 && vlans.length > 0,
-        errors: []
-      };
-
+      // Use real backend API for validation
+      const validation = await deploymentAPI.validateDeployment(config);
       setValidationResults(validation);
       
       if (validation.valid) {
         console.log('Validation successful, moving to next step');
         handleNext();
       } else {
-        console.log('Validation failed:', validation.errors);
+        console.log('Validation failed:', validation.connectivity);
       }
     } catch (error) {
       console.error('Validation failed:', error);
+      // Set validation results to show error
+      setValidationResults({ valid: false, connectivity: [] });
     }
   };
 
-  const handleDeploy = async (data: any) => {
+  const handleDeploy = async () => {
     setIsDeploying(true);
     setDeploymentProgress([]);
 
@@ -175,11 +172,20 @@ const SpineLeafDeployment: React.FC = () => {
         spineSwitches,
         leafSwitches,
         vlans,
-        underlayProtocol: data.underlayProtocol
+        underlayProtocol: 'ospf'
       };
 
+      console.log('Starting deployment...', config);
+
+      // Use real backend API for deployment
       const result = await deploymentAPI.deploySpineLeaf(config);
-      setShowResults(true);
+      
+      if (result.success) {
+        setShowResults(true);
+        console.log('Deployment completed successfully!');
+      } else {
+        console.error('Deployment failed:', result.message);
+      }
     } catch (error) {
       console.error('Deployment failed:', error);
     } finally {
@@ -201,7 +207,7 @@ const SpineLeafDeployment: React.FC = () => {
           leafSwitches={leafSwitches} 
           vlans={vlans}
           validationResults={validationResults}
-          onDeploy={handleSubmit(handleDeploy)}
+          onDeploy={handleDeploy}
           isDeploying={isDeploying}
         />;
       default:
