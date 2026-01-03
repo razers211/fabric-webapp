@@ -87,7 +87,9 @@ const SpineLeafDeployment: React.FC = () => {
       setDeploymentProgress((prev: DeploymentResult[]) => [...prev, data]);
     });
 
-    return () => newSocket.close();
+    return () => {
+      newSocket.close();
+    };
   }, []);
 
   const addSwitch = (type: 'spine' | 'leaf', switchData: SwitchFormData) => {
