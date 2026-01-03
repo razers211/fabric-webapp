@@ -146,20 +146,61 @@ const SpineLeafDeployment: React.FC = () => {
 
       console.log('Validating configuration...', config);
 
-      // Use real backend API for validation
-      const validation = await deploymentAPI.validateDeployment(config);
-      setValidationResults(validation);
-      
-      if (validation.valid) {
-        console.log('Validation successful, moving to next step');
-        handleNext();
-      } else {
-        console.log('Validation failed:', validation.connectivity);
+      // First check basic configuration requirements
+      const basicValidation = {
+        valid: spineSwitches.length > 0 && leafSwitches.length > 0 && vlans.length > 0,
+        errors: []
+      };
+
+      if (!basicValidation.valid) {
+        const errors = [];
+        if (spineSwitches.length === 0) errors.push('At least one spine switch is required');
+        if (leafSwitches.length === 0) errors.push('At least one leaf switch is required');
+        if (vlans.length === 0) errors.push('At least one VLAN is required');
+        
+        setValidationResults({
+          valid: false,
+          connectivity: [],
+          errors: errors
+        });
+        console.log('Basic validation failed:', errors);
+        return;
+      }
+
+      // Try backend validation, but don't fail completely if switches aren't reachable
+      try {
+        const validation = await deploymentAPI.validateDeployment(config);
+        setValidationResults(validation);
+        
+        if (validation.valid) {
+          console.log('Validation successful, moving to next step');
+          handleNext();
+        } else {
+          console.log('Backend validation failed:', validation.connectivity);
+        }
+      } catch (error) {
+        console.error('Backend validation failed, using basic validation:', error);
+        // Fallback to basic validation if backend fails
+        setValidationResults({
+          valid: basicValidation.valid,
+          connectivity: [],
+          errors: [],
+          warning: 'Backend validation failed - using basic validation'
+        });
+        
+        if (basicValidation.valid) {
+          console.log('Basic validation passed, moving to next step');
+          handleNext();
+        }
       }
     } catch (error) {
       console.error('Validation failed:', error);
       // Set validation results to show error
-      setValidationResults({ valid: false, connectivity: [] });
+      setValidationResults({ 
+        valid: false, 
+        connectivity: [],
+        errors: ['Validation failed: ' + error.message]
+      });
     }
   };
 
