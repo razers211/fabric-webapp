@@ -48,6 +48,10 @@ const schema = yup.object().shape({
   underlayProtocol: yup.string().oneOf(['ospf', 'bgp']).required(),
 });
 
+interface FormData {
+  underlayProtocol: 'ospf' | 'bgp';
+}
+
 interface SwitchFormData {
   host: string;
   username: string;
@@ -66,7 +70,7 @@ const SpineLeafDeployment: React.FC = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [validationResults, setValidationResults] = useState<any>(null);
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
       underlayProtocol: 'ospf'
