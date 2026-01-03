@@ -64,7 +64,9 @@ const Dashboard: React.FC = () => {
       addActivity(`${data.portCount} ports configured on ${data.switch}`);
     });
 
-    return () => newSocket.close();
+    return () => {
+      newSocket.close();
+    };
   }, []);
 
   const addActivity = (activity: string) => {
