@@ -337,11 +337,64 @@ const TenantManagement: React.FC = () => {
 
       <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)} maxWidth="md" fullWidth>
         <DialogTitle>Add New Tenant</DialogTitle>
-                    edge="end"
-                    onClick={() => removePortFromTenant(index)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Tenant Name"
+            value={newTenant.tenantName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTenant({ ...newTenant, tenantName: e.target.value })}
+            margin="normal"
+          />
+
+          <Box sx={{ mt: 2, mb: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              VLANs
+            </Typography>
+            <Button
+              variant="outlined"
+              onClick={addVlanToTenant}
+              sx={{ mb: 1 }}
+            >
+              Add VLAN
+            </Button>
+            <Box>
+              {newTenant.vlans.map((vlan: number, index: number) => (
+                <Chip
+                  key={index}
+                  label={`VLAN ${vlan}`}
+                  onDelete={() => removeVlanFromTenant(vlan)}
+                  sx={{ mr: 0.5, mb: 0.5 }}
+                />
+              ))}
+            </Box>
+          </Box>
+
+          <Box sx={{ mt: 2, mb: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Access Ports
+            </Typography>
+            <Button
+              variant="outlined"
+              onClick={addPortToTenant}
+              sx={{ mb: 1 }}
+            >
+              Add Port
+            </Button>
+            <List>
+              {newTenant.accessPorts.map((port: any, index: number) => (
+                <ListItem key={index}>
+                  <ListItemText
+                    primary={port.interface}
+                    secondary={`VLAN ${port.vlan}${port.description ? ` - ${port.description}` : ''}`}
+                  />
+                  <ListItemSecondaryAction>
+                    <IconButton
+                      edge="end"
+                      onClick={() => removePortFromTenant(index)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
                 </ListItem>
               ))}
             </List>
