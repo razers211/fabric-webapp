@@ -49,7 +49,17 @@ cp .env.example .env
 # Edit .env with your configuration
 ```
 
-3. **Start the application**:
+3. **Build the application**:
+```bash
+# For production deployment
+npm run build
+
+# Or use the build script
+build.bat  # On Windows
+./build.sh # On Unix/Mac
+```
+
+4. **Start the application**:
 ```bash
 # Development mode
 npm run dev
@@ -58,8 +68,8 @@ npm run dev
 npm start
 ```
 
-4. **Access the application**:
-- Frontend: http://localhost:3000
+5. **Access the application**:
+- Frontend: http://localhost:3001 (served by backend)
 - Backend API: http://localhost:3001
 
 ## Configuration
